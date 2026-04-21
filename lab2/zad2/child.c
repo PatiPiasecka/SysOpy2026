@@ -6,26 +6,24 @@
 #include <unistd.h>
 
 void handler(int signal_number){
-    //przechwycenie sygnalu
     printf("Wywołano handler dla sygnału %d\n", signal_number);
 }
 
 void sig_default() {
-    //dla SIGUSR1 dzialanei domyslne to jego zakonczenie
     printf("Wywołano funkcję 'sig_default()'\n");
     signal(SIGUSR1, SIG_DFL);
 }
 
 void sig_mask(){
     printf("Wywołano funkcję 'sig_mask()'\n");
-    sigset_t mask; //tworzy zbior sygnalow
-    sigemptyset(&mask); //czysci zbior
-    sigaddset(&mask, SIGUSR1); //dodaje SIGUSR1
-    sigprocmask(SIG_BLOCK, &mask, NULL); //pending - trzymam w poczekalni
+    sigset_t mask;
+    sigemptyset(&mask);
+    sigaddset(&mask, SIGUSR1);
+    sigprocmask(SIG_BLOCK, &mask, NULL);
+
 }
 
 void sig_unblock(){
-    //odblokowuje sygnal z poczekalni
     sigset_t mask;
     sigemptyset(&mask);
     sigaddset(&mask, SIGUSR1);
@@ -33,22 +31,34 @@ void sig_unblock(){
 }
 
 void sig_ignore(){
-    // otrzyma sygnal ale nic nie zrobi
     printf("Wywołano funkcję 'sig_ignore()'\n");
     signal(SIGUSR1, SIG_IGN);
 }
 
 void sig_handle(){
-    //reakcja na handler
     printf("Wywołano funkcję 'sig_handle()'\n");
     signal(SIGUSR1, handler);
 }
 
-int main(int argc, char *argv[]) {
-    if (strcmp(argv[1], "default") == 0) sig_default();
-    else if (strcmp(argv[1], "mask") == 0) sig_mask();
-    else if (strcmp(argv[1], "ignore") == 0) sig_ignore();
-    else if (strcmp(argv[1], "handle") == 0) sig_handle();
+void handler_usr2(int sig, siginfo_t *info, void *context){
+    int choice = info -> si_value.sival_int;
+    if (choice == 1) sig_default();
+    else if (choice == 2) sig_mask();
+    else if (choice == 3) sig_ignore();
+    else if (choice == 4) sig_handle();
+}
+
+int main() {
+    struct sigaction sa;
+    sa.sa_sigaction = handler_usr2;
+    //blokujemy inne sygnaly
+    sigemptyset(&sa.sa_mask);
+
+    //otrzymywanie tego co wyslal rodzic przez sigqueue
+    sa.sa_flags = SA_SIGINFO; 
+    
+    //pomaga przy handlerze do SIGUSR2
+    sigaction(SIGUSR2, &sa, NULL);
 
     for (int i = 1; i <= 20; i++) {
         printf("%d\n", i);
@@ -60,14 +70,14 @@ int main(int argc, char *argv[]) {
 
         if (i==10){
             sigset_t pending;
-            sigpending(&pending); // sprawdza sygnaly ktore czekaja
+            sigpending(&pending);
             if (sigismember(&pending, SIGUSR1)){
                 printf("Odblokowuje USR1\n");
                 sig_unblock();
             }
         }
 
-        sleep(1); //sygnaly sa asynchroniczne i moga wystapic w dowolnym momencie 
+        sleep(1);
     }
 
     printf("Petla zostala wykonana w calosci\n");
