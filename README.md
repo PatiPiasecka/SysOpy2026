@@ -1,6 +1,6 @@
-# SysOpy2026 - Systems Programming Course
+# SysOpy2026 - Operating Systems Course
 
-This repository contains coursework and laboratory assignments for the **Systems Programming (SysOpy)** course at the **AGH University of Krakow**, faculty of Computer Science.
+This repository contains coursework and laboratory assignments for the **Operating Systems (SysOpy)** course at the **AGH University of Krakow**, faculty of Computer Science.
 
 The course focuses on fundamental concepts and practical implementation skills in systems programming, including process management, inter-process communication, file operations, and low-level system interactions.
 
@@ -8,7 +8,7 @@ The course focuses on fundamental concepts and practical implementation skills i
 
 - **University:** AGH University of Kraków 
 - **Faculty:** Computer Science
-- **Course:** Systems Programming (SysOpy)
+- **Course:** Operating Systems (SysOpy)
 - **Academic Year:** 2026
 - **Language:** C
 
@@ -37,7 +37,7 @@ SysOpy2026/
 
 ## Typical Topics Covered
 
-Systems programming courses typically cover:
+Operating Systems courses typically cover:
 
 - Process creation and management
 - Inter-process communication (IPC)
